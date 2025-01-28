@@ -1,4 +1,5 @@
-const express = require('express');
+import express from 'express';
+
 const app = express();
 const port = 3000;
 
@@ -10,6 +11,11 @@ let users = [
     { id: 1, name: 'John Doe', email: 'john.doe@example.com' },
     { id: 2, name: 'Jane Doe', email: 'jane.doe@example.com' }
 ];
+const welcome = {status: 'ok'}
+
+app.get('/', (req, res) => {
+    res.status(200).json(welcome);
+})
 
 // Endpoint do pobierania wszystkich użytkowników
 app.get('/users', (req, res) => {
