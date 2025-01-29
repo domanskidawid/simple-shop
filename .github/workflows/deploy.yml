@@ -1,4 +1,4 @@
-name: Deploy AWS Lambda
+name: Build and Deploy AWS Lambda
 
 on:
   push:
@@ -6,38 +6,43 @@ on:
       - main
 
 jobs:
-  deploy:
+  build-deploy:
     runs-on: ubuntu-latest
 
-    permissions:
-      id-token: write  # Updated to 'read' instead of 'write'
-      contents: read
-
     steps:
+      # Checkout the code
       - name: Checkout Code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v3  # Use the latest stable version
 
+      # Setup Python environment
+      - name: Set up Python
+        uses: actions/setup-python@v4  # Use the latest stable version
+
+      # Setup AWS SAM CLI
+      - name: Set up AWS SAM CLI
+        uses: aws-actions/setup-sam-cli@v1  # This action is already fine
+
+      # Configure AWS Credentials
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v2
+        uses: aws-actions/configure-aws-credentials@v2  # Use the latest version of configure-aws-credentials
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: eu-north-1  # Ensure that this region is correct for your AWS setup
+          aws-region: ${{ secrets.AWS_REGION }}  # You can store the region in your GitHub Secrets for better security
 
-      - name: Install AWS SAM CLI
-        run: |
-          curl -sSL https://github.com/aws/aws-sam-cli/releases/latest/download/install | bash
-          echo "$HOME/.local/bin" >> $GITHUB_PATH
-          # Ensure that the AWS SAM CLI is available after installation
-          export PATH=$HOME/.local/bin:$PATH
+      # Build the Lambda function using SAM
+      - name: Build Lambda
+        run: sam build --use-container  # Use container to build Lambda
 
-      - name: Build Lambda Function
-        run: |
-          sam build  # Building the Lambda function
+      # (Optional) Run Unit Tests
+      # You can insert the command to run unit tests here, e.g.:
+      # - run: pytest tests/
 
-      - name: Deploy Lambda Function
+      # Deploy the Lambda function using SAM
+      - name: Deploy Lambda
         run: |
           sam deploy \
-            --stack-name my-lambda-stack \
+            --no-confirm-changeset \
+            --no-fail-on-empty-changeset \
+            --stack-name sam-hello-world \
             --capabilities CAPABILITY_IAM \
-            --no-confirm-changeset  # This flag is for skipping changeset confirmation
