@@ -18,7 +18,7 @@ Resources:
           Type: Api
           Properties:
             Path: /hello
-            Method: get
+            Method: ANY
       Policies:
         - S3CrudPolicy:
             BucketName: !Ref S3Bucket
