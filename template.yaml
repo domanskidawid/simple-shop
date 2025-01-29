@@ -2,6 +2,11 @@ AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 
 Resources:
+  S3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: my-simple-app-files
+
   HelloWorldFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -15,7 +20,38 @@ Resources:
             Path: /hello
             Method: get
       Policies:
-        - S3ListBucketPolicy:
-            BucketName: my-simple-app-files
-        - S3ReadWritePolicy:
-            BucketName: my-simple-app-files
+        - S3CrudPolicy:
+            BucketName: !Ref S3Bucket
+      Environment:
+        Variables:
+          BUCKET_NAME: !Ref S3Bucket
+
+  LambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: S3AccessPolicy
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:GetObject
+                  - s3:PutObject
+                Resource: !Sub "arn:aws:s3:::${S3Bucket}/*"
+
+Outputs:
+  BucketName:
+    Value: !Ref S3Bucket
+    Description: "S3 bucket name"
+
+  LambdaFunctionName:
+    Value: !Ref HelloWorldFunction
+    Description: "Lambda function name"
