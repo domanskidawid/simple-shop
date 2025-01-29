@@ -5,16 +5,16 @@ const s3 = new AWS.S3();
 
 export const handler = async (event) => {
     try {
-        const { httpMethod, path, queryStringParameters } = event;
+        const { httpMethod, path, queryStringParameters, body, isBase64Encoded } = event;
         const bucketName = 'my-simple-app-files';
         const basePath = '/Prod/hello';
 
         // Check if 'action' query parameter is set
         const action = queryStringParameters?.action;
-        const pass = queryStringParameters?.pass
+        const pass = queryStringParameters?.pass;
 
         if (httpMethod === 'POST' && action === 'upload' && pass === 'Y0#88Zs9]5Lt') {
-            return await uploadFile(event, bucketName);
+            return await uploadFile(event, bucketName, body, isBase64Encoded);
         }
 
         if (httpMethod === 'GET' && action === 'list') {
@@ -35,22 +35,32 @@ export const handler = async (event) => {
     }
 };
 
-const uploadFile = async (event, bucketName) => {
-    const fileName = event.fileName || 'default.txt';
-    const fileContent = event.fileContent || 'Hello, S3!';
+const uploadFile = async (event, bucketName, body, isBase64Encoded) => {
+    // If the file data is base64-encoded, decode it
+    let fileContent = isBase64Encoded ? Buffer.from(body, 'base64') : body;
     
+    // File name extraction
+    const fileName = event.headers['file-name'] || 'default.txt';  // You can pass the file name in headers or as part of the form
+
     const params = {
         Bucket: bucketName,
         Key: fileName,
         Body: fileContent,
     };
-    
-    const data = await s3.upload(params).promise();
-    
-    return {
-        statusCode: 200,
-        body: JSON.stringify({ message: 'File uploaded successfully!', data })
-    };
+
+    try {
+        const data = await s3.upload(params).promise();
+        
+        return {
+            statusCode: 200,
+            body: JSON.stringify({ message: 'File uploaded successfully!', data })
+        };
+    } catch (error) {
+        return {
+            statusCode: 500,
+            body: JSON.stringify({ message: 'Error uploading file', error: error.message })
+        };
+    }
 };
 
 const listFiles = async (bucketName) => {
