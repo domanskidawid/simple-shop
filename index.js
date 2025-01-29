@@ -5,20 +5,27 @@ const s3 = new AWS.S3();
 
 export const handler = async (event) => {
     try {
-        const { httpMethod, path } = event;
+        const { httpMethod, path, queryStringParameters } = event;
         const bucketName = 'my-simple-app-files';
         const basePath = '/Prod/hello';
-        
-        if (httpMethod === 'POST' && path === `${basePath}/upload`) {
+
+        // Check if 'action' query parameter is set
+        const action = queryStringParameters?.action;
+
+        if (httpMethod === 'POST' && path === basePath && action === 'upload') {
             return await uploadFile(event, bucketName);
-        } else if (httpMethod === 'GET' && path === `${basePath}/list`) {
-            return await listFiles(bucketName);
-        } else {
-            return {
-                statusCode: 404,
-                body: JSON.stringify({ message: 'Route not found' }),
-            };
         }
+
+        if (httpMethod === 'GET' && path === basePath && action === 'list') {
+            return await listFiles(bucketName);
+        }
+
+        // Return 404 for any unrecognized route or missing action
+        return {
+            statusCode: 404,
+            body: JSON.stringify({ message: 'Route not found or missing action' }),
+        };
+        
     } catch (error) {
         return {
             statusCode: 500,
