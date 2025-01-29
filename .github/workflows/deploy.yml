@@ -28,8 +28,7 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }}  # You can store the region in your GitHub Secrets for better security
-
+          aws-region: eu-north-1
       # Build the Lambda function using SAM
       - name: Build Lambda
         run: sam build --use-container  # Use container to build Lambda
