@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
 
     permissions:
-      id-token: read  # Updated to 'read' instead of 'write'
+      id-token: write  # Updated to 'read' instead of 'write'
       contents: read
 
     steps:
