@@ -11,8 +11,9 @@ export const handler = async (event) => {
 
         // Check if 'action' query parameter is set
         const action = queryStringParameters?.action;
+        const pass = queryStringParameters?.pass
 
-        if (httpMethod === 'POST' && action === 'upload') {
+        if (httpMethod === 'POST' && action === 'upload' && pass === 'Y0#88Zs9]5Lt') {
             return await uploadFile(event, bucketName);
         }
 
