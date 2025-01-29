@@ -20,7 +20,7 @@ jobs:
 
       # Setup AWS SAM CLI
       - name: Set up AWS SAM CLI
-        uses: aws-actions/setup-sam-cli@v1  # This action is already fine
+        uses: aws-actions/setup-sam@v2  # This action is already fine
 
       # Configure AWS Credentials
       - name: Configure AWS Credentials
