@@ -14,17 +14,8 @@ Resources:
           Properties:
             Path: /hello
             Method: get
-      RolePolicy:
-        - PolicyName: S3PermissionsForLambda
-          PolicyDocument:
-            Version: "2012-10-17"
-            Statement:
-              - Effect: Allow
-                Action: 
-                  - s3:ListBucket
-                Resource: arn:aws:s3:::my-simple-app-files
-              - Effect: Allow
-                Action:
-                  - s3:GetObject
-                  - s3:PutObject
-                Resource: arn:aws:s3:::my-simple-app-files/*
+      Policies:
+        - S3ListBucketPolicy:
+            BucketName: my-simple-app-files
+        - S3ReadWritePolicy:
+            BucketName: my-simple-app-files
