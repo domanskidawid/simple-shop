@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
 
     permissions:
-      id-token: write
+      id-token: read  # Updated to 'read' instead of 'write'
       contents: read
 
     steps:
@@ -22,14 +22,22 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: eu-north-1
+          aws-region: eu-north-1  # Ensure that this region is correct for your AWS setup
 
       - name: Install AWS SAM CLI
         run: |
           curl -sSL https://github.com/aws/aws-sam-cli/releases/latest/download/install | bash
           echo "$HOME/.local/bin" >> $GITHUB_PATH
+          # Ensure that the AWS SAM CLI is available after installation
+          export PATH=$HOME/.local/bin:$PATH
 
-      - name: Build and Deploy Lambda
+      - name: Build Lambda Function
         run: |
-          sam build
-          sam deploy --stack-name my-lambda-stack --capabilities CAPABILITY_IAM --no-confirm-changeset
+          sam build  # Building the Lambda function
+
+      - name: Deploy Lambda Function
+        run: |
+          sam deploy \
+            --stack-name my-lambda-stack \
+            --capabilities CAPABILITY_IAM \
+            --no-confirm-changeset  # This flag is for skipping changeset confirmation
