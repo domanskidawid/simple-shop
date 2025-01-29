@@ -10,26 +10,26 @@ jobs:
     runs-on: ubuntu-latest
 
     permissions:
-      id-token: write  # Required for OIDC authentication
+      id-token: write
       contents: read
 
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      - name: Configure AWS Credentials via OIDC
+      - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: eu-north-1
 
-      - name: Install AWS SAM
+      - name: Install AWS SAM CLI
         run: |
           curl -sSL https://github.com/aws/aws-sam-cli/releases/latest/download/install | bash
           echo "$HOME/.local/bin" >> $GITHUB_PATH
 
-      - name: Build and Deploy
+      - name: Build and Deploy Lambda
         run: |
           sam build
           sam deploy --stack-name my-lambda-stack --capabilities CAPABILITY_IAM --no-confirm-changeset
