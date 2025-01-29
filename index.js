@@ -12,11 +12,11 @@ export const handler = async (event) => {
         // Check if 'action' query parameter is set
         const action = queryStringParameters?.action;
 
-        if (httpMethod === 'POST' && path === basePath && action === 'upload') {
+        if (httpMethod === 'POST' && action === 'upload') {
             return await uploadFile(event, bucketName);
         }
 
-        if (httpMethod === 'GET' && path === basePath && action === 'list') {
+        if (httpMethod === 'GET' && action === 'list') {
             return await listFiles(bucketName);
         }
 
