@@ -7,10 +7,11 @@ export const handler = async (event) => {
     try {
         const { httpMethod, path } = event;
         const bucketName = 'my-simple-app-files';
+        const basePath = '/Prod/hello';
         
-        if (httpMethod === 'POST' && path === '/upload') {
+        if (httpMethod === 'POST' && path === `${basePath}/upload`) {
             return await uploadFile(event, bucketName);
-        } else if (httpMethod === 'GET' && path === '/list') {
+        } else if (httpMethod === 'GET' && path === `${basePath}/list`) {
             return await listFiles(bucketName);
         } else {
             return {
